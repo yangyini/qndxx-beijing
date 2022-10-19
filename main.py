@@ -14,7 +14,7 @@ class Course():
         self.title = None
         self.url = None
         self.end_img_url = None
-        self.study_url = None
+        # self.study_url = None
 
     def update(self, headers):
         try:
@@ -26,7 +26,7 @@ class Course():
             self.url = index['newCourse']['url']
             i = self.url.find("/m.html")
             self.end_img_url = self.url[:i] + '/images/end.jpg'
-            self.study_url = f"https://m.bjyouth.net/dxx/check?id={self.id}&org_id=%s"
+            # self.study_url = f"https://m.bjyouth.net/dxx/check?id={self.id}&org_id=%s"
             print(f'[INFO] updated course: {self.title}')
             return 1
         except:
@@ -105,12 +105,14 @@ class Youth():
         # update if needed
         if self.course_need_update:
             if not self.course.update(self.headers):
-                return 1
+                return 0
             self.course_need_update = False
         # study
-        r = requests.get(url=self.course.study_url % self.org_id, headers=self.headers, timeout=5)
+        # r = requests.get(url=self.course.study_url % self.org_id, headers=self.headers, timeout=5)
+        data= {"id": self.course.id, "org_id": self.org_id}
+        r = requests.post(url="https://m.bjyouth.net/dxx/check", headers=self.headers, timeout=5,json=data)
         if r.text:
-            print('[Error] study error: {r.text}')
+            print(f'[Error] study error: {r.text}')
             return 0
         print('[INFO] study complete.')
         return 1
